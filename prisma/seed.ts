@@ -97,17 +97,46 @@ async function main() {
     ]
   });
 
-  await prisma.cV.create({
+    await prisma.cV.create({
     data: {
+      userId: demoUser.id,
+      title: 'Onesiforus - UI/UX Designer',
       fullName: 'Onesiforus',
       targetRole: 'UI/UX Designer',
-      summary: 'Fresh graduate dengan minat pada desain produk digital.',
+      education: 'Fresh graduate S1 dengan fokus pada desain produk digital.',
       experience: 'Mengerjakan project redesign aplikasi kampus dan studi kasus dashboard.',
       skills: 'Figma, UX Research, Wireframing, Design Systems',
-      aiSummary: 'UI/UX Designer muda dengan pengalaman project akademik dan portofolio yang menunjukkan kemampuan riset, wireframing, dan desain antarmuka yang terstruktur untuk kebutuhan produk digital.',
-      aiExperience: 'Memimpin redesign aplikasi kampus, menyusun user flow, wireframe, dan prototype high-fidelity serta melakukan usability testing sederhana untuk meningkatkan kejelasan navigasi.',
-      aiSkills: 'Figma, UX Research, Wireframing, Prototype, Design Systems, Usability Testing',
-      userId: demoUser.id
+      projects: 'Redesign dashboard akademik, mobile app case study, landing page design.',
+      certifications: 'Google UX Design (opsional)',
+      generatedSummary:
+        'UI/UX Designer muda dengan pengalaman project akademik dan portofolio yang menunjukkan kemampuan riset, wireframing, dan desain antarmuka yang terstruktur untuk kebutuhan produk digital.',
+      generatedSkills: JSON.stringify([
+        'Figma',
+        'UX Research',
+        'Wireframing',
+        'Prototype',
+        'Design Systems',
+        'Usability Testing'
+      ]),
+      generatedExperience: JSON.stringify([
+        'Memimpin redesign aplikasi kampus untuk meningkatkan kejelasan navigasi dan pengalaman pengguna.',
+        'Menyusun user flow, wireframe, dan prototype high-fidelity untuk studi kasus dashboard.',
+        'Melakukan usability testing sederhana untuk menemukan masalah utama pada antarmuka.'
+      ]),
+      generatedProjects: JSON.stringify([
+        'Redesign aplikasi kampus berbasis riset pengguna.',
+        'Membuat studi kasus dashboard dari wireframe hingga prototype.',
+        'Merancang landing page modern untuk kebutuhan promosi digital.'
+      ]),
+      generatedEducation:
+        'Lulusan baru dengan fokus pada UI/UX, desain produk digital, dan pendekatan berbasis kebutuhan pengguna.',
+      generatedCertifications:
+        'Google UX Design (jika ada), pelatihan desain antarmuka dan pengalaman pengguna.',
+      generatedTips: JSON.stringify([
+        'Gunakan kata kerja aktif pada deskripsi pengalaman.',
+        'Tambahkan metrik hasil jika ada.',
+        'Sesuaikan skill dengan posisi yang dilamar.'
+      ])
     }
   });
 
