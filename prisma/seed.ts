@@ -71,31 +71,27 @@ async function main() {
   const services = await prisma.service.findMany();
 
   await prisma.order.createMany({
-    data: [
-      {
-        customerName: demoUser.name,
-        email: demoUser.email,
-        paymentMethod: 'Transfer bank',
-        total: 104000,
-        platformFee: 5000,
-        status: OrderStatus.COMPLETED,
-        userId: demoUser.id,
-        serviceId: services[0].id,
-        notes: 'Mohon fokus pada perbaikan summary dan keyword ATS.'
-      },
-      {
-        customerName: demoUser.name,
-        email: demoUser.email,
-        paymentMethod: 'E-Wallet',
-        total: 154000,
-        platformFee: 5000,
-        status: OrderStatus.IN_PROGRESS,
-        userId: demoUser.id,
-        serviceId: services[1].id,
-        notes: 'Target untuk posisi Product Designer.'
-      }
-    ]
-  });
+  data: [
+    {
+      userId: demoUser.id,
+      serviceId: 'cv-review-premium',
+      paymentMethod: 'Transfer Bank',
+      amount: 99000,
+      total: 104000,
+      platformFee: 5000,
+      status: OrderStatus.COMPLETED,
+    },
+    {
+      userId: demoUser.id,
+      serviceId: 'ai-photo-pro',
+      paymentMethod: 'E-Wallet',
+      amount: 79000,
+      total: 84000,
+      platformFee: 5000,
+      status: OrderStatus.IN_PROGRESS,
+    }
+  ]
+});
 
     await prisma.cV.create({
     data: {
