@@ -1,0 +1,1 @@
+export const authCookieName = 'karirhub_user_id';
