@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { OrderStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUserOrDemo } from '@/lib/auth';
 
@@ -42,15 +43,12 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-
     const serviceId = String(body.serviceId || '').trim();
-    const customerName = String(body.customerName || user.name || '').trim();
-    const email = String(body.email || user.email || '').trim();
     const paymentMethod = String(body.paymentMethod || 'MANUAL').trim();
 
-    if (!serviceId || !customerName || !email) {
+    if (!serviceId) {
       return NextResponse.json(
-        { message: 'Data checkout belum lengkap.' },
+        { message: 'serviceId wajib diisi.' },
         { status: 400 }
       );
     }
@@ -72,12 +70,11 @@ export async function POST(request: Request) {
 
     const order = await prisma.order.create({
       data: {
-        customerName,
-        email,
         paymentMethod,
         amount,
         total,
         platformFee,
+        status: OrderStatus.PENDING,
         userId: user.id,
         serviceId: service.id
       },
