@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
-import { gemini } from '@/lib/gemini';
+import { getGeminiClient } from '@/lib/gemini';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUserOrDemo } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 function cleanJson(text: string) {
   return text
@@ -12,6 +15,8 @@ function cleanJson(text: string) {
 
 export async function POST(req: Request) {
   try {
+    const gemini = getGeminiClient();
+
     const user = await getCurrentUserOrDemo();
     if (!user) {
       return NextResponse.json({ message: 'User tidak ditemukan.' }, { status: 401 });
@@ -70,28 +75,17 @@ Aturan output:
 - Tulis bullet dengan gaya ATS yang kuat, jelas, dan terukur bila memungkinkan.
 `;
 
-    const modelName = 'gemini-2.5-flash-lite';
-
-let response;
-try {
-  response = await gemini.models.generateContent({
-    model: modelName,
-    contents: prompt
-  });
-} catch (error: any) {
-  console.error('Gemini error:', error);
-  return NextResponse.json(
-    {
-      message: 'Gemini sedang sibuk. Coba lagi beberapa saat.'
-    },
-    { status: 503 }
-  );
-}
-    
+    const response = await gemini.models.generateContent({
+      model: 'gemini-2.5-flash-lite',
+      contents: prompt
+    });
 
     const rawText = response.text?.trim();
     if (!rawText) {
-      return NextResponse.json({ message: 'Gemini tidak mengembalikan hasil.' }, { status: 500 });
+      return NextResponse.json(
+        { message: 'Gemini tidak mengembalikan hasil.' },
+        { status: 500 }
+      );
     }
 
     const text = cleanJson(rawText);
@@ -135,8 +129,14 @@ try {
       cv: saved,
       result: parsed
     });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Terjadi kesalahan server.' }, { status: 500 });
+  } catch (error: any) {
+    console.error('CV GENERATE ERROR:', error);
+
+    return NextResponse.json(
+      {
+        message: error?.message || 'Terjadi kesalahan server.'
+      },
+      { status: 500 }
+    );
   }
 }

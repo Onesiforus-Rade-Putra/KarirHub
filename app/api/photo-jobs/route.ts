@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { gemini } from '@/lib/gemini';
+import { getGeminiClient } from '@/lib/gemini';
 import { getCurrentUserOrDemo } from '@/lib/auth';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const ratioMap: Record<string, string> = {
   'Rasio 4:5': '4:5',
@@ -13,7 +16,7 @@ const ratioMap: Record<string, string> = {
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUserOrDemo();
-
+    const gemini = getGeminiClient();
     if (!user) {
       return NextResponse.json({ message: 'User tidak ditemukan.' }, { status: 401 });
     }
