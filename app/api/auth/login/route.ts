@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authCookieName } from '@/lib/auth-config';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const email = String(body.email || '').trim();
+    const email = String(body.email || '').trim().toLowerCase();
     const password = String(body.password || '').trim();
 
     if (!email || !password) {
@@ -20,21 +22,14 @@ export async function POST(req: Request) {
       where: { email }
     });
 
-    if (!user) {
+    if (!user || user.password !== password) {
       return NextResponse.json(
         { message: 'Email atau password salah.' },
         { status: 401 }
       );
     }
 
-    if (user.password !== password) {
-      return NextResponse.json(
-        { message: 'Email atau password salah.' },
-        { status: 401 }
-      );
-    }
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       message: 'Login berhasil.',
       user: {
         id: user.id,
@@ -43,6 +38,15 @@ export async function POST(req: Request) {
         role: user.role
       }
     });
+
+    response.cookies.set(authCookieName, user.id, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+      sameSite: 'lax'
+    });
+
+    return response;
   } catch (error) {
     console.error('LOGIN ERROR:', error);
     return NextResponse.json(

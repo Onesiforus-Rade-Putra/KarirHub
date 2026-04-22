@@ -16,8 +16,8 @@ function cleanJson(text: string) {
 export async function POST(req: Request) {
   try {
     const gemini = getGeminiClient();
-
     const user = await getCurrentUserOrDemo();
+
     if (!user) {
       return NextResponse.json({ message: 'User tidak ditemukan.' }, { status: 401 });
     }
@@ -75,17 +75,23 @@ Aturan output:
 - Tulis bullet dengan gaya ATS yang kuat, jelas, dan terukur bila memungkinkan.
 `;
 
-    const response = await gemini.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
-      contents: prompt
-    });
+    let response;
+    try {
+      response = await gemini.models.generateContent({
+        model: 'gemini-2.5-flash-lite',
+        contents: prompt
+      });
+    } catch (error) {
+      console.error('Gemini error:', error);
+      return NextResponse.json(
+        { message: 'Gemini sedang sibuk. Coba lagi beberapa saat.' },
+        { status: 503 }
+      );
+    }
 
     const rawText = response.text?.trim();
     if (!rawText) {
-      return NextResponse.json(
-        { message: 'Gemini tidak mengembalikan hasil.' },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: 'Gemini tidak mengembalikan hasil.' }, { status: 500 });
     }
 
     const text = cleanJson(rawText);
@@ -129,14 +135,8 @@ Aturan output:
       cv: saved,
       result: parsed
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('CV GENERATE ERROR:', error);
-
-    return NextResponse.json(
-      {
-        message: error?.message || 'Terjadi kesalahan server.'
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Terjadi kesalahan server.' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { AtsCvBuilderForm } from '@/components/forms/AtsCvBuilderForm';
 import { getCurrentUserOrDemo } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-
+export const dynamic = 'force-dynamic';
 export default async function AtsCvBuilderPage() {
   const user = await getCurrentUserOrDemo();
 

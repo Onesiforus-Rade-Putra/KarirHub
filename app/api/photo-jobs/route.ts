@@ -15,8 +15,9 @@ const ratioMap: Record<string, string> = {
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUserOrDemo();
     const gemini = getGeminiClient();
+    const user = await getCurrentUserOrDemo();
+
     if (!user) {
       return NextResponse.json({ message: 'User tidak ditemukan.' }, { status: 401 });
     }
@@ -52,7 +53,7 @@ Ketentuan:
 `;
 
     const response = await gemini.models.generateContent({
-      model: 'gemini-3.1-flash-image-preview',
+      model: 'gemini-2.0-flash-exp',
       contents: [
         {
           inlineData: {
@@ -61,13 +62,7 @@ Ketentuan:
           }
         },
         { text: prompt }
-      ],
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'],
-        imageConfig: {
-          aspectRatio: ratioMap[ratio] || '4:5'
-        }
-      }
+      ]
     });
 
     const parts = response.candidates?.[0]?.content?.parts || [];
@@ -91,11 +86,17 @@ Ketentuan:
     const outputDir = path.join(process.cwd(), 'public', 'generated');
     const outputPath = path.join(outputDir, fileName);
 
-    await mkdir(outputDir, { recursive: true });
-    const outputBytes = Uint8Array.from(Buffer.from(outputBase64, 'base64'));
-await writeFile(outputPath, outputBytes);
+    let resultUrl: string;
 
-    const resultUrl = `/generated/${fileName}`;
+    try {
+      await mkdir(outputDir, { recursive: true });
+      const outputBytes = Uint8Array.from(Buffer.from(outputBase64, 'base64'));
+      await writeFile(outputPath, outputBytes);
+      resultUrl = `/generated/${fileName}`;
+    } catch (fileError) {
+      console.error('PHOTO FILE WRITE ERROR:', fileError);
+      resultUrl = `data:${outputMime};base64,${outputBase64}`;
+    }
 
     const job = await prisma.photoJob.create({
       data: {
@@ -118,24 +119,24 @@ await writeFile(outputPath, outputBytes);
       }
     });
   } catch (error: any) {
-  console.error('PHOTO JOB ERROR:', error);
+    console.error('PHOTO JOB ERROR:', error);
 
-  const rawMessage =
-    error?.message ||
-    error?.error?.message ||
-    'Terjadi kesalahan server saat generate foto.';
+    const rawMessage =
+      error?.message ||
+      error?.error?.message ||
+      'Terjadi kesalahan server saat generate foto.';
 
-  const friendlyMessage =
-    rawMessage.includes('Quota') ||
-    rawMessage.includes('RESOURCE_EXHAUSTED')
-      ? 'Generate foto AI belum tersedia di free tier Gemini. Untuk sekarang pakai hasil demo dulu atau aktifkan billing.'
-      : rawMessage;
+    const friendlyMessage =
+      rawMessage.includes('Quota') ||
+      rawMessage.includes('RESOURCE_EXHAUSTED')
+        ? 'Generate foto AI belum tersedia di free tier Gemini. Untuk sekarang pakai hasil demo dulu atau aktifkan billing.'
+        : rawMessage;
 
-  return NextResponse.json(
-    {
-      message: friendlyMessage
-    },
-    { status: 500 }
-  );
-}
+    return NextResponse.json(
+      {
+        message: friendlyMessage
+      },
+      { status: 500 }
+    );
+  }
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ServiceCard } from '@/components/ServiceCard';
 import { prisma } from '@/lib/prisma';
-
+export const dynamic = 'force-dynamic';
 export default async function HomePage() {
   const services = await prisma.service.findMany({ take: 4, orderBy: { createdAt: 'desc' } });
 

@@ -1,6 +1,6 @@
 import { ProfileForm } from '@/components/forms/ProfileForm';
 import { getCurrentUserOrDemo } from '@/lib/auth';
-
+export const dynamic = 'force-dynamic';
 export default async function ProfilePage() {
   const user = await getCurrentUserOrDemo();
   const initials = user?.name?.split(' ').map((x) => x[0]).slice(0, 2).join('').toUpperCase() || 'KH';

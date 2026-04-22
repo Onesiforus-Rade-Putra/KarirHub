@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { formatRupiah } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
-
+export const dynamic = 'force-dynamic';
 export default async function ServiceDetailPage({ params }: { params: { id: string } }) {
   const service = await prisma.service.findUnique({ where: { id: params.id } }) || await prisma.service.findFirst();
 

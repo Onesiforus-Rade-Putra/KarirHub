@@ -2,7 +2,7 @@ import { CheckoutForm } from '@/components/forms/CheckoutForm';
 import { getCurrentUserOrDemo } from '@/lib/auth';
 import { formatRupiah } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
-
+export const dynamic = 'force-dynamic';
 export default async function CheckoutPage({ searchParams }: { searchParams?: { serviceId?: string } }) {
   const user = await getCurrentUserOrDemo();
   const selectedId = searchParams?.serviceId;

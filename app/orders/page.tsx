@@ -1,7 +1,7 @@
 import { getCurrentUserOrDemo } from '@/lib/auth';
 import { formatRupiah } from '@/lib/format';
 import { prisma } from '@/lib/prisma';
-
+export const dynamic = 'force-dynamic';
 export default async function OrdersPage() {
   const user = await getCurrentUserOrDemo();
   const orders = user ? await prisma.order.findMany({ where: { userId: user.id }, include: { service: true }, orderBy: { createdAt: 'desc' } }) : [];

@@ -3,7 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { authCookieName } from '@/lib/auth-config';
 
 export async function getCurrentUser() {
-  const userId = cookies().get(authCookieName)?.value;
+  const cookieStore = await cookies();
+  const userId = cookieStore.get(authCookieName)?.value;
+
   if (!userId) return null;
 
   return prisma.user.findUnique({
@@ -19,3 +21,5 @@ export async function getCurrentUserOrDemo() {
     orderBy: { createdAt: 'asc' }
   });
 }
+
+export { authCookieName };
