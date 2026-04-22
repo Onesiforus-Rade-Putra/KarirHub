@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  JOB_SEEKER
+  SELLER
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum PhotoJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  phone     String?
+  birthDate String?
+  headline  String?
+  location  String?
+  about     String?
+  role      Role       @default(JOB_SEEKER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  orders    Order[]
+  cvs       CV[]
+  photoJobs PhotoJob[]
+}
+
+model Service {
+  id           String   @id
+  title        String
+  category     String
+  price        Int
+  rating       Float
+  provider     String
+  deliveryDays Int
+  description  String
+  createdAt    DateTime @default(now())
+  orders       Order[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customerName  String
+  email         String
+  notes         String?
+  paymentMethod String
+  total         Int
+  platformFee   Int         @default(5000)
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  userId        String
+  serviceId     String
+  user          User        @relation(fields: [userId], references: [id])
+  service       Service     @relation(fields: [serviceId], references: [id])
+}
+
+model CV {
+  id                      String   @id @default(cuid())
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id])
+  title                   String
+  fullName                String
+  targetRole              String
+  education               String
+  experience              String
+  skills                  String
+  projects                String
+  certifications          String
+  generatedSummary        String
+  generatedSkills         String
+  generatedExperience     String
+  generatedProjects       String
+  generatedEducation      String
+  generatedCertifications String
+  generatedTips           String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model PhotoJob {
+  id               String         @id @default(cuid())
+  originalFileName String?
+  style            String
+  background       String
+  ratio            String
+  status           PhotoJobStatus @default(QUEUED)
+  resultUrl        String?
+  createdAt        DateTime       @default(now())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+}
