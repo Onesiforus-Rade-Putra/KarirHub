@@ -42,13 +42,13 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const serviceId = String(body.serviceId || '').trim();
-    const customerName = String(body.customerName || '').trim();
-    const email = String(body.email || '').trim();
-    const paymentMethod = String(body.paymentMethod || '').trim();
-    const notes = String(body.notes || '').trim();
 
-    if (!serviceId || !customerName || !email || !paymentMethod) {
+    const serviceId = String(body.serviceId || '').trim();
+    const customerName = String(body.customerName || user.name || '').trim();
+    const email = String(body.email || user.email || '').trim();
+    const paymentMethod = String(body.paymentMethod || 'MANUAL').trim();
+
+    if (!serviceId || !customerName || !email) {
       return NextResponse.json(
         { message: 'Data checkout belum lengkap.' },
         { status: 400 }
@@ -75,7 +75,6 @@ export async function POST(request: Request) {
         customerName,
         email,
         paymentMethod,
-        notes: notes || null,
         amount,
         total,
         platformFee,
