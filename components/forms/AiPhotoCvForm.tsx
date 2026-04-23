@@ -54,6 +54,13 @@ export function AiPhotoCvForm({ initial }: { initial?: Job | null }) {
     setResult(data.job);
   };
 
+    const resetAll = () => {
+    setFile(null);
+    setFileName('');
+    setResult(null);
+    setMessage('');
+  };
+
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
       <section className="card p-8 md:p-10">
@@ -116,8 +123,17 @@ export function AiPhotoCvForm({ initial }: { initial?: Job | null }) {
               Preview AI photo akan muncul di sini
             </div>
           )}
-        </div>
-
+          </div>
+            <a
+            href={result?.resultUrl || '#'}
+            download="cv-photo.jpg"
+            onClick={result?.resultUrl ? resetAll : undefined}
+            className={`mt-6 flex w-full items-center justify-center ${
+              result?.resultUrl ? 'btn-primary' : 'btn-secondary pointer-events-none opacity-50'
+            }`}
+          >
+            Download foto
+          </a>
         {result?.resultUrl ? (
           <a
             href={result.resultUrl}
@@ -129,10 +145,26 @@ export function AiPhotoCvForm({ initial }: { initial?: Job | null }) {
         ) : null}
 
         <div className="mt-6 grid gap-3">
-          <button type="button" className="btn-secondary">Gunakan untuk profil</button>
-          <button type="button" className="btn-secondary">Gunakan untuk CV</button>
-        </div>
-      </aside>
-    </div>
-  );
+          <button
+            className="btn-secondary mt-4 w-full"
+            onClick={() => {
+              // nanti bisa kirim ke backend
+              resetAll();
+            }}
+          >
+            Gunakan untuk profil
+          </button>
+          <button
+            className="btn-secondary mt-3 w-full"
+            onClick={() => {
+              // nanti bisa kirim ke backend
+              resetAll();
+            }}
+          >
+            Gunakan untuk CV
+          </button>
+                  </div>
+                </aside>
+              </div>
+            );
 }
