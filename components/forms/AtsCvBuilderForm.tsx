@@ -1,8 +1,19 @@
 'use client';
-
 import { useState } from 'react';
 
+const emptyForm = {
+  fullName: '',
+  targetRole: '',
+  education: '',
+  experience: '',
+  skills: '',
+  projects: '',
+  certifications: ''
+};
+
 type AtsResult = {
+  fullName?: string;
+  targetRole?: string;
   professional_summary: string;
   skills: string[];
   experience_bullets: string[];
@@ -31,28 +42,38 @@ type InitialCV = {
 
 export function AtsCvBuilderForm({ initial }: { initial?: InitialCV | null }) {
   const [form, setForm] = useState({
-    fullName: initial?.fullName || '',
-    targetRole: initial?.targetRole || '',
-    education: initial?.education || '',
-    experience: initial?.experience || '',
-    skills: initial?.skills || '',
-    projects: initial?.projects || '',
-    certifications: initial?.certifications || ''
+  ...emptyForm,
+  fullName: initial?.fullName || '',
+  targetRole: initial?.targetRole || '',
+  education: initial?.education || '',
+  experience: initial?.experience || '',
+  skills: initial?.skills || '',
+  projects: initial?.projects || '',
+  certifications: initial?.certifications || ''
   });
 
   const [result, setResult] = useState<AtsResult | null>(
-    initial
-      ? {
-          professional_summary: initial.generatedSummary || '',
-          skills: initial.generatedSkills ? JSON.parse(initial.generatedSkills) : [],
-          experience_bullets: initial.generatedExperience ? JSON.parse(initial.generatedExperience) : [],
-          project_bullets: initial.generatedProjects ? JSON.parse(initial.generatedProjects) : [],
-          education_section: initial.generatedEducation || '',
-          certification_section: initial.generatedCertifications || '',
-          ats_tips: initial.generatedTips ? JSON.parse(initial.generatedTips) : []
-        }
-      : null
+  initial
+    ? {
+        fullName: initial.fullName || '',
+        targetRole: initial.targetRole || '',
+        professional_summary: initial.generatedSummary || '',
+        skills: initial.generatedSkills ? JSON.parse(initial.generatedSkills) : [],
+        experience_bullets: initial.generatedExperience ? JSON.parse(initial.generatedExperience) : [],
+        project_bullets: initial.generatedProjects ? JSON.parse(initial.generatedProjects) : [],
+        education_section: initial.generatedEducation || '',
+        certification_section: initial.generatedCertifications || '',
+        ats_tips: initial.generatedTips ? JSON.parse(initial.generatedTips) : []
+      }
+    : null
   );
+
+  const handleExportPdf = () => {
+  window.print(); // atau logic export pdf kamu nanti
+  setForm(emptyForm);
+  setMessage('');
+  setResult(null);
+};
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -82,7 +103,12 @@ export function AtsCvBuilderForm({ initial }: { initial?: InitialCV | null }) {
     }
 
     setMessage(data.message || 'CV ATS berhasil digenerate.');
-    setResult(data.result);
+    setResult({
+    ...data.result,
+    fullName: form.fullName,
+    targetRole: form.targetRole
+    });
+    setForm(emptyForm);
   };
 
   return (
@@ -163,8 +189,8 @@ export function AtsCvBuilderForm({ initial }: { initial?: InitialCV | null }) {
           ) : (
             <div className="space-y-5">
               <div>
-                <p className="font-bold text-primary">{form.fullName || 'Nama Lengkap'}</p>
-                <p className="mt-2">{form.targetRole || 'Posisi target'}</p>
+                <p className="font-bold text-primary">{result.fullName || 'Nama Lengkap'}</p>
+                <p className="mt-2">{result.targetRole || 'Posisi target'}</p>
               </div>
 
               <div>
@@ -221,9 +247,13 @@ export function AtsCvBuilderForm({ initial }: { initial?: InitialCV | null }) {
           )}
         </div>
 
-        <button type="button" className="btn-secondary mt-6 w-full">
-          Export PDF (next step)
-        </button>
+        <button
+  type="button"
+  className="btn-secondary mt-6 w-full"
+  onClick={handleExportPdf}
+>
+  Export PDF
+</button>
       </aside>
     </div>
   );

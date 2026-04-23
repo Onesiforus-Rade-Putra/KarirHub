@@ -14,28 +14,7 @@ export default async function AtsCvBuilderPage() {
 
   return (
     <main className="container-app py-12">
-      <AtsCvBuilderForm
-        initial={
-          initial
-            ? {
-                fullName: initial.fullName,
-                targetRole: initial.targetRole,
-                education: initial.education,
-                experience: initial.experience,
-                skills: initial.skills,
-                projects: initial.projects,
-                certifications: initial.certifications,
-                generatedSummary: initial.generatedSummary,
-                generatedSkills: initial.generatedSkills,
-                generatedExperience: initial.generatedExperience,
-                generatedProjects: initial.generatedProjects,
-                generatedEducation: initial.generatedEducation,
-                generatedCertifications: initial.generatedCertifications,
-                generatedTips: initial.generatedTips
-              }
-            : null
-        }
-      />
+      <AtsCvBuilderForm initial={null} />
     </main>
   );
 }
